@@ -1,6 +1,6 @@
 package response;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -32,7 +32,17 @@ public class ResponseHandler {
      *         Collection to fetch
      */
     public ResponseHandler(final String database, final String collection) {
-        this.userService = new UserService(database, collection);
+        this(new UserService(database, collection));
+    }
+
+    /**
+     * Constructor for unit testing
+     *
+     * @param userService
+     *         User service
+     */
+    public ResponseHandler(final UserService userService) {
+        this.userService = userService;
     }
 
     /**
@@ -54,7 +64,7 @@ public class ResponseHandler {
             this.logger.info("[GET] Found " + allUsers.size() + " users...");
             final List<String> users = new ArrayList<>();
             for (final Document document : allUsers) {
-                users.add(prettyPrint(document));
+                users.add(this.prettyPrint(document));
             }
 
             return String.join("\n", users);
@@ -71,7 +81,7 @@ public class ResponseHandler {
      */
     private String prettyPrint(final Object object) throws JsonProcessingException {
         final ObjectMapper mapper = new ObjectMapper();
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+        mapper.setSerializationInclusion(Include.NON_EMPTY);
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
         return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(object);
     }
@@ -94,13 +104,13 @@ public class ResponseHandler {
         // If found, return user details
         if (user != null) {
             this.logger.info("[GET] Found user with id: " + id);
-            return prettyPrint(user);
+            return this.prettyPrint(user);
         }
 
         // Else, return error
         res.status(404);
         this.logger.warn("[GET] User not found");
-        return prettyPrint(new ResponseMessage("No user with id " + id + " found", 404));
+        return this.prettyPrint(new ResponseMessage("No user with id " + id + " found", 404));
     }
 
     /**
@@ -114,7 +124,7 @@ public class ResponseHandler {
     public String create(final Request req) throws JsonProcessingException {
         this.userService.createUser(req.body());
         this.logger.info("[CREATE] User created!");
-        return prettyPrint(new ResponseMessage("User created!!", 200));
+        return this.prettyPrint(new ResponseMessage("User created!!", 200));
     }
 
     /**
@@ -128,7 +138,7 @@ public class ResponseHandler {
     public String update(final Request req) throws Exception {
         this.userService.updateUser(req.body());
         this.logger.info("[UPDATE] User updated!");
-        return prettyPrint(new ResponseMessage("User updated!!", 200));
+        return this.prettyPrint(new ResponseMessage("User updated!!", 200));
     }
 
     /**
@@ -145,7 +155,7 @@ public class ResponseHandler {
 
         this.userService.removeUser(id);
         this.logger.info("[REMOVE] User " + id + " removed");
-        return prettyPrint(new ResponseMessage("User " + id + " removed!!", 200));
+        return this.prettyPrint(new ResponseMessage("User " + id + " removed!!", 200));
     }
 
     /**
@@ -162,7 +172,7 @@ public class ResponseHandler {
         try {
             // Pretty print error
             this.logger.warn(e.getMessage());
-            res.body(prettyPrint(new ResponseMessage(e.getMessage(), 400)));
+            res.body(this.prettyPrint(new ResponseMessage(e.getMessage(), 400)));
         } catch (final JsonProcessingException e1) {
             // If pretty print failed, set errors in string
             this.logger.error(e1.getMessage());

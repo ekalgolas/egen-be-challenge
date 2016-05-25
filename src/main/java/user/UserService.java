@@ -31,7 +31,7 @@ public class UserService implements IUserService {
      *         Collection to fetch
      */
     public UserService(final String database, final String collection) {
-        this(getCollection(database, collection));
+        this(UserService.getCollection(database, collection));
     }
 
     /**
@@ -47,6 +47,7 @@ public class UserService implements IUserService {
         final Document key = new Document("id", 1);
         final IndexOptions options = new IndexOptions();
         options.unique(true);
+        options.sparse(true);
         this.dbCollection.createIndex(key, options);
     }
 

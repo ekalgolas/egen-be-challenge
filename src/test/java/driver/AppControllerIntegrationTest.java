@@ -32,10 +32,10 @@ public class AppControllerIntegrationTest {
      */
     @BeforeClass
     public static void setUp() throws Exception {
-        AppControllerIntegrationTest.logger.info("Start Spark server and connect to MongoDB...");
-        new AppController(AppControllerIntegrationTest.TEST, AppControllerIntegrationTest.TEST);
+        logger.info("Start Spark server and connect to MongoDB...");
+        new AppController(TEST, TEST);
         Thread.sleep(2000);
-        AppControllerIntegrationTest.logger.info("Server started!");
+        logger.info("Server started!");
     }
 
     /**
@@ -45,8 +45,8 @@ public class AppControllerIntegrationTest {
      */
     @AfterClass
     public static void tearDown() throws Exception {
-        AppControllerIntegrationTest.logger.info("Removing all the test work..");
-        UserService.getCollection(AppControllerIntegrationTest.TEST, AppControllerIntegrationTest.TEST).drop();
+        logger.info("Removing all the test work..");
+        UserService.getCollection(TEST, TEST).drop();
         Spark.stop();
     }
 
@@ -56,28 +56,27 @@ public class AppControllerIntegrationTest {
     @Test
     public void testFlow() {
         // First check if DB empty
-        String response = AppControllerIntegrationTest.execute("/users", null, "GET");
+        String response = this.execute("/users", null, "GET");
         Assert.assertEquals("No users expected", JsonTestStringsFactory.NO_USERS_FOUND, response);
 
         // Then, create a user
-        response = AppControllerIntegrationTest.execute("/create", JsonTestStringsFactory.VALID_LONG_JSON, "PUT");
+        response = this.execute("/create", JsonTestStringsFactory.VALID_LONG_JSON, "PUT");
         Assert.assertEquals("User not created", JsonTestStringsFactory.USER_CREATED, response);
 
         // Then, update the user created above
-        response = AppControllerIntegrationTest
-                .execute("/update", JsonTestStringsFactory.VALID_LONG_JSON_UPDATED, "PUT");
+        response = this.execute("/update", JsonTestStringsFactory.VALID_LONG_JSON_UPDATED, "PUT");
         Assert.assertEquals("User not updated", JsonTestStringsFactory.USER_UPDATED, response);
 
         // Then, remove a non existing user
-        response = AppControllerIntegrationTest.execute("/remove/invalidTest", null, "POST");
+        response = this.execute("/remove/invalidTest", null, "POST");
         Assert.assertTrue("Non existing user removed", response.contains("User not found to remove"));
 
         // Then, remove the user
-        response = AppControllerIntegrationTest.execute("/remove/1630215c-2608-44b9-aad4-9d56d8aafd4c", null, "POST");
+        response = this.execute("/remove/1630215c-2608-44b9-aad4-9d56d8aafd4c", null, "POST");
         Assert.assertTrue("User not removed", response.contains("User 1630215c-2608-44b9-aad4-9d56d8aafd4c removed!!"));
 
         // Again check if DB empty
-        response = AppControllerIntegrationTest.execute("/users", null, "GET");
+        response = this.execute("/users", null, "GET");
         Assert.assertEquals("No users expected", JsonTestStringsFactory.NO_USERS_FOUND, response);
     }
 
@@ -92,7 +91,7 @@ public class AppControllerIntegrationTest {
      *         HTTP Method used
      * @return Response as JSON string
      */
-    private static String execute(final String targetURL, final String json, final String method) {
+    private String execute(final String targetURL, final String json, final String method) {
         HttpURLConnection connection = null;
         try {
             // Create connection

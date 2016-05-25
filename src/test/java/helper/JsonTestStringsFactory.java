@@ -52,6 +52,11 @@ public class JsonTestStringsFactory {
             "'dateCreated':'2016-06-15T07:02:40.896Z'," +
             "'profilePic':'http://lorempixel.com/640/480/people'}";
 
+    public static final String NO_USERS_FOUND = "{\n" +
+            "  \"message\" : \"Database empty!!\",\n" +
+            "  \"status\" : 400\n" +
+            "}";
+
     public static final String NO_USER_FOUND = "{\n" +
             "  \"message\" : \"No user with id invalidTest found\",\n" +
             "  \"status\" : 404\n" +
@@ -79,7 +84,7 @@ public class JsonTestStringsFactory {
             "  }\n" +
             "}";
 
-    public static final String GET_ALL_USERS = JsonTestStringsFactory.GET_ONE_USER + "\n" +
+    public static final String GET_ALL_USERS = GET_ONE_USER + "\n" +
             "{\n" +
             "  \"id\" : \"two\"\n" +
             "}";

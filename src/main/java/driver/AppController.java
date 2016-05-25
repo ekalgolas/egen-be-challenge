@@ -49,9 +49,9 @@ public class AppController {
      *         Command line arguments
      */
     public static void main(final String[] args) {
-        final AppController appController = new AppController("egen", "users");
+        // Create controller an run an infinite loop
+        new AppController("egen", "users");
         while (true) {
-
         }
     }
 }
